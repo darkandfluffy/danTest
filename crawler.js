@@ -30,7 +30,7 @@ async function downloadFile(fileUrl) {
       method: "GET",
       url: fileUrl,
       responseType: "stream",
-      timeout: 60000
+      timeout: 60000,
     });
 
     const writer = fs.createWriteStream(localPath);
@@ -43,7 +43,6 @@ async function downloadFile(fileUrl) {
     });
 
     console.log(`Saved: ${localPath}`);
-
   } catch (error) {
     console.error(`Failed: ${fileUrl}`);
     console.error(error.message);
@@ -55,7 +54,7 @@ async function run() {
 
   const urls = (await fs.readFile(INPUT_FILE, "utf8"))
     .split("\n")
-    .map(u => u.trim())
+    .map((u) => u.trim())
     .filter(Boolean);
 
   console.log(`Found ${urls.length} URLs`);
