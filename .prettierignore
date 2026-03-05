@@ -1,0 +1,9 @@
+node_modules/
+*.jpg
+*.png
+*.gif
+*.svg
+*.ico
+scratch.txt
+test.iml
+package-lock.json
