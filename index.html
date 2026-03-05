@@ -5795,7 +5795,7 @@ body.be-themes-layout-layout-border.top-header.slider-bar-opened #main #header #
                                 data-thumbnail-bg-gradient="background:rgba(255,255,255,0.78)" data-title-style="style3"
                                 data-cat-color="" data-title-color="rgba(0,0,0,1)" data-hover-style="style1-hover"
                                 data-gutter-width="20" data-img-grayscale="c_to_c"
-                            " data-gradient-style-color="background:rgba(255,255,255,0.78)" data-cat-hide="1"
+                                data-gradient-style-color="background:rgba(255,255,255,0.78)" data-cat-hide="1"
                             data-like-indicator="1" style="margin-right: 20px;">
                             <div class="filters clearfix border align-center" style="margin-left:20px;">
                               <div class="filter_item"><span class="sort current_choice" data-id="element">All</span>
@@ -5810,7 +5810,7 @@ body.be-themes-layout-layout-border.top-header.slider-bar-opened #main #header #
                               <div
                                   class="element be-hoverlay not-wide no-wide-width-height style1-hover c_to_c style3-title no-parallax-effect"
                                   style="margin-bottom: 20px;position: absolute; left: 0px; top: 0px;"
-                                  data-category-names="right-of-way ">
+                                  data-category-names="right-of-way">
                                 <div class="element-inner" style="margin-left: 20px;"><a
                                     href="https://cei-az.com/projects/city-of-safford-20th-avenue-road-widening/"
                                     class=" thumb-wrap   " data-gdpr-atts={} title="2">
@@ -7266,5 +7266,56 @@ body.be-themes-layout-layout-border.top-header.slider-bar-opened #main #header #
 <script type="text/javascript"
         src="https://cei-az.com/wp-content/plugins/masterslider/public/assets/js/masterslider.min.js?ver=3.6.5"
         id="masterslider-core-js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  var filters   = document.querySelector('.filters.border');
+  if (!filters) return;
+
+  var container = filters.nextElementSibling;
+  while (container && !container.classList.contains('portfolio-container')) {
+    container = container.nextElementSibling;
+  }
+  if (!container) return;
+
+  var items    = Array.from(container.querySelectorAll('.element[data-category-names]'));
+  var sortBtns = Array.from(filters.querySelectorAll('.sort'));
+
+  // Derive column layout from the initial item positions
+  var uniqueLefts = [...new Set(items.map(function (el) { return parseInt(el.style.left); }))].sort(function (a, b) { return a - b; });
+  var uniqueTops  = [...new Set(items.map(function (el) { return parseInt(el.style.top);  }))].sort(function (a, b) { return a - b; });
+  var COL_COUNT  = uniqueLefts.length;
+  var COL_WIDTH  = COL_COUNT  > 1 ? uniqueLefts[1] - uniqueLefts[0] : 381;
+  var ROW_HEIGHT = uniqueTops.length > 1 ? uniqueTops[1] - uniqueTops[0] : 348;
+
+  function applyFilter(filterId) {
+    var visibleIdx = 0;
+    items.forEach(function (item) {
+      var cats    = item.getAttribute('data-category-names').trim().split(/\s+/);
+      var visible = filterId === 'element' || cats.indexOf(filterId) !== -1;
+      if (visible) {
+        item.style.display = '';
+        var col = visibleIdx % COL_COUNT;
+        var row = Math.floor(visibleIdx / COL_COUNT);
+        item.style.left = (col * COL_WIDTH) + 'px';
+        item.style.top  = (row * ROW_HEIGHT) + 'px';
+        visibleIdx++;
+      } else {
+        item.style.display = 'none';
+      }
+    });
+    var rows = Math.ceil(visibleIdx / COL_COUNT);
+    container.style.height = (rows * ROW_HEIGHT) + 'px';
+  }
+
+  sortBtns.forEach(function (btn) {
+    btn.style.cursor = 'pointer';
+    btn.addEventListener('click', function () {
+      sortBtns.forEach(function (b) { b.classList.remove('current_choice'); });
+      btn.classList.add('current_choice');
+      applyFilter(btn.getAttribute('data-id'));
+    });
+  });
+});
+</script>
 </body>
 </html>
